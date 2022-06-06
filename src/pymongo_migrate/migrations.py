@@ -16,10 +16,10 @@ class Migration:
     def initial(self):
         return not self.dependencies
 
-    def upgrade(self, db: Database):
+    def upgrade(self, ctx, db: Database):
         raise NotImplementedError()
 
-    def downgrade(self, db: Database):
+    def downgrade(self, ctx, db: Database):
         raise NotImplementedError()
 
 
@@ -29,10 +29,10 @@ class MigrationModuleType(ModuleType):
     name: str
     dependencies: List[str]
 
-    def upgrade(self, db: Database):
+    def upgrade(self, ctx, db: Database):
         raise NotImplementedError()
 
-    def downgrade(self, db: Database):
+    def downgrade(self, ctx, db: Database):
         raise NotImplementedError()
 
 
@@ -49,11 +49,11 @@ class MigrationModuleWrapper(Migration):
     def description(self):
         return self.module.__doc__
 
-    def upgrade(self, db: Database):
-        self.module.upgrade(db)
+    def upgrade(self, ctx, db: Database):
+        self.module.upgrade(ctx, db)
 
-    def downgrade(self, db: Database):
-        self.module.downgrade(db)
+    def downgrade(self, ctx, db: Database):
+        self.module.downgrade(ctx, db)
 
 
 class MigrationsGraph:
