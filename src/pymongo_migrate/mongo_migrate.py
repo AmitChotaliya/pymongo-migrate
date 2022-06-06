@@ -1,7 +1,7 @@
 import datetime
 import logging
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Iterator, Optional
 
@@ -71,7 +71,7 @@ class MongoMigrate:
     migrations_dir: str = "./pymongo_migrations"
     migrations_collection: str = "pymongo_migrate"
     logger: logging.Logger = LOGGER
-    ctx: dict = {}
+    ctx: dict = field(default_factory=dict)    
 
     def __post_init__(self):
         self.graph = MigrationsGraph()
