@@ -8,6 +8,7 @@ import click
 import pymongo.monitoring
 
 from pymongo_migrate.graph_draw import dump
+from pymongo_migrate.loader import load_context
 from pymongo_migrate.mongo_migrate import MongoMigrate
 
 
@@ -58,7 +59,8 @@ def get_logger(verbose: int):
 
 def mongo_migrate_decor(f):
     @wraps(f)
-    def wrap_with_client(uri, migrations, collection, verbose, *args, **kwargs):
+    def wrap_with_client(uri, migrations, collection, ctx_file, verbose, *args, **kwargs):
+        ctx = load_context(ctx_file)
         mongo_migrate = MongoMigrate(
             client=pymongo.MongoClient(
                 uri, event_listeners=[CommandLogger(verbose=verbose)]
@@ -66,6 +68,7 @@ def mongo_migrate_decor(f):
             migrations_dir=migrations,
             migrations_collection=collection,
             logger=get_logger(verbose),
+            ctx=ctx
         )
         return f(mongo_migrate, *args, **kwargs)
 
@@ -103,6 +106,13 @@ def mongo_migration_options(f):
             envvar="PYMONGO_MIGRATE_COLLECTION",
             help="mongodb collection used for storing migration states",
             show_default=True,
+        ),
+        click.option(
+            "-x",
+            "--ctx-file",
+            default=None,
+            envvar="PYMONGO_EXTRA_CONTEXT",
+            help="extra context details for the migrations",
         ),
         click.option("-v", "--verbose", count=True),
         mongo_migrate_decor,

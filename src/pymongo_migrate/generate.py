@@ -11,11 +11,11 @@ name = {name!r}
 dependencies = {dependencies!r}
 
 
-def upgrade(db: "pymongo.database.Database"):
+def upgrade(ctx: dict, db: "pymongo.database.Database"):
     pass
 
 
-def downgrade(db: "pymongo.database.Database"):
+def downgrade(ctx: dict, db: "pymongo.database.Database"):
     pass
 '''
 MAX_NAME_LEN = 60

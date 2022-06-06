@@ -4,6 +4,16 @@ from typing import Generator, cast
 
 from pymongo_migrate.migrations import MigrationModuleType, MigrationModuleWrapper
 
+def load_context(ctx_file_path):
+    try:
+        loader = importlib.machinery.SourceFileLoader('context', ctx_file_path)
+        spec = importlib.util.spec_from_loader(loader.name, loader)
+        mod = importlib.util.module_from_spec(spec)
+        loader.exec_module(mod)
+        return mod.context()
+    except:
+        return None
+    
 
 def load_module_migrations(
     path: Path, namespace=f"{__name__}._migrations"

@@ -3,7 +3,7 @@ import logging
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Any, Iterator, Optional
 
 import pymongo
 from bson import CodecOptions
@@ -71,6 +71,7 @@ class MongoMigrate:
     migrations_dir: str = "./pymongo_migrations"
     migrations_collection: str = "pymongo_migrate"
     logger: logging.Logger = LOGGER
+    ctx: dict = {}
 
     def __post_init__(self):
         self.graph = MigrationsGraph()
@@ -166,7 +167,7 @@ class MongoMigrate:
             else:
                 self.logger.info("Running upgrade migration %r", migration.name)
                 with _MeasureTime() as mt:
-                    migration.upgrade(self.db)
+                    migration.upgrade(self.ctx, self.db)
                     self.logger.info(
                         "Execution time of %r: %s seconds", migration.name, mt.elapsed
                     )
@@ -201,7 +202,7 @@ class MongoMigrate:
             else:
                 self.logger.info("Running downgrade migration %r", migration.name)
                 with _MeasureTime() as mt:
-                    migration.downgrade(self.db)
+                    migration.downgrade(self.ctx, self.db)
                     self.logger.info(
                         "Execution time of %r: %s seconds", migration.name, mt.elapsed
                     )
